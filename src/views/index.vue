@@ -83,6 +83,7 @@
 </style>
 <template>
   <div class="g-body">
+    <!-- header -->
     <el-row type="flex" class="g-head">
       <a href="http://refined-x.com" target="_blank" title="Vue权限控制" class="logo" >Vue-Access-Control</a>
       <div class="nav">
@@ -94,6 +95,7 @@
       </div>
     </el-row>
 
+    <!-- 菜单 -->
     <el-menu :default-active="activeMenu" class="g-side" router >
       <template v-for="(route, index) in menus">
         <template v-if="route.children">
@@ -109,6 +111,7 @@
       </template>
     </el-menu>
 
+    <!-- 面包屑 -->
     <div class="g-statues-bar p-lr">
       <el-breadcrumb separator="/" class="bread" id="mybread">
         <el-breadcrumb-item v-for="(item,index) in breadcrumbs" :key="index" :to="item">
@@ -116,18 +119,21 @@
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
+
+    <!-- 路由渲染 -->
     <template v-if="$route.path=='/'">
       <dashboard />
     </template>
     <template v-else>
-    <router-view id="main"></router-view>
+      <router-view id="main"></router-view>
     </template>
-    
   </div>
 </template>
 <script>
 import instance from "../api";
 import { changePw } from "../api/account";
+import * as util from '../assets/util.js';
+import { mapState } from 'vuex';
 
 export default {
   components: {
@@ -145,7 +151,11 @@ export default {
     },
     breadcrumbs: function(){
       return (this.$route && this.$route.matched) || []
-    }
+    },
+    ...mapState([
+      'menuData1',
+      'userData1'
+    ]),
   },
   methods: {
     logout: function() {
@@ -161,13 +171,15 @@ export default {
     }
   },
   created: function() {
-    let user = this.$parent.userData;
+    //let user = this.$parent.userData || JSON.parse(util.local('userInfo'));
+    let user = this.userData1;
     if (user) {
       this.user = user;
     } else {
       this.$router.push({ path: "/login" });
     }
-    let menus = this.$parent.menuData;
+    //let menus = this.$parent.menuData || JSON.parse(util.local('menuData'));
+    let menus = this.menuData1;
     if (menus) {
       this.menus = menus;
     }

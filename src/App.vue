@@ -11,15 +11,12 @@ import Vue from 'vue';
 import instance from './api';
 import userPath from './router/fullpath';
 import * as util from './assets/util.js';
-
 //请求拦截句柄
 let myInterceptor;
 
 export default {
   data() {
     return {
-      menuData: null,
-      userData: null
     }
   },
   methods: {
@@ -33,21 +30,24 @@ export default {
       }
       return resourcePermission;
     },
-    setInterceptor: function(resourcePermission) {
+    setInterceptor: function(resourcePermission) {//权限接口拦截器
       let vm = this;
       myInterceptor = instance.interceptors.request.use(function(config) {
         //得到请求路径
         let perName = config.url.replace(config.baseURL, '').replace('/GET','').replace('/POST','').split('?')[0];
         //权限格式1 /path/${param}
+        console.log(1,perName)
         let reg1 = perName.match(/^(\/[^\/]+\/)[^\/]+$/);
         if (reg1) {
           perName = reg1[1] + '**';
         }
+        console.log(2,perName)
         //权限格式2 /path/${param}/path
         let reg2 = perName.match(/^\/[^\/]+\/([^\/]+)\/[^\/]+$/);
         if (reg2) {
           perName = perName.replace(reg2[1], '*');
         }
+        console.log(3,perName)
         //校验权限
         if (!resourcePermission[config.method + ',' + perName]) {
           //调试信息
@@ -139,7 +139,7 @@ export default {
     signin: function(callback) {
       let vm = this;
       //检查登录状态
-      let localUser = util.session('token');
+      let localUser = util.local('token');
       if (!localUser || !localUser.token) {
         return vm.$router.push({ path: '/login', query: { from: vm.$router.currentRoute.path } });
       }
@@ -160,14 +160,16 @@ export default {
         let allowedRouter = vm.getRoutes(userInfo);
         //若无可用路由限制访问
         if (!allowedRouter || !allowedRouter.length) {
-          util.session('token','');
+          util.local('token','');
           return document.body.innerHTML = ('<h1>账号访问受限，请联系系统管理员！</h1>');
         }
         //动态注入路由
         vm.extendRoutes(allowedRouter);
-        //保存数据用作他处，非必需
-        vm.menuData = allowedRouter;
-        vm.userData = userInfo;
+
+        //保存数据到store用作他处，非必需
+        vm.$store.commit('setMenu',allowedRouter)
+        vm.$store.commit('setUser',userInfo)
+       
         //权限检验方法
         Vue.prototype.$_has = function(rArray) {
           let resources = [];
@@ -198,10 +200,11 @@ export default {
       });
     },
     logoutDirect: function(){
-      //退出时清除路由权限控制
+      //退出时清除路由权限控制 eject移除 权限拦截器
       instance.interceptors.request.eject(myInterceptor);
+      util.local('token','');
       this.$router.replace({path: '/login'});
-    }
+    },
   },
   created: function(newPath) {
     this.signin();

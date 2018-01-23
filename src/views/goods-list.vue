@@ -3,7 +3,7 @@
 </style>
 
 <template>
-  <div v-loading="loading">
+  <div v-loading="loading" element-loading-text="正在加载...">
     <!-- 操作 -->
     <div class="operation">
       <el-button size="small" type="primary" v-has="[goods.request]" @click="fetchData">查询</el-button>
@@ -13,7 +13,7 @@
     </div>
     <!-- list -->
     <el-table :data="list" border style="width: 100%">
-      <el-table-column prop="number" label="商品编号">
+      <el-table-column prop="id" label="商品编号">
       </el-table-column>
       <el-table-column prop="name" label="商品名称">
       </el-table-column>
@@ -23,7 +23,7 @@
       </el-table-column>
       <el-table-column prop="standard" label="规格型号">
       </el-table-column>
-      <el-table-column prop="creation_time_beauty" label="创建时间" align="center">
+      <el-table-column prop="creation_time" label="创建时间" align="center">
       </el-table-column>
     </el-table>
     
@@ -32,6 +32,7 @@
 
 <script>
 import * as goods from "../api/goods";
+import * as utils from "../assets/util"
 
 let myMixin = {
   data: function() {
@@ -54,6 +55,7 @@ export default {
       vm.loading = true;
       goods.request.r(vm.queryParam).then(res => {
         vm.list = res.data.content;
+        vm.list.forEach(el => el.creation_time = utils.dateFormat(el.creation_time));
         vm.loading = false;
       });
     },

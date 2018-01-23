@@ -78,7 +78,7 @@ export default {
       requestLogin(loginParams).then(res => {
         vm.isBtnLoading = false;
         if(res.data.token){
-          util.session('token', res.data);
+          util.local('token', res.data);
           vm.$emit('login', vm.$router.currentRoute.query.from);
         }else{
           return Promise.reject({
