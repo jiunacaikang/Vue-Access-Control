@@ -167,7 +167,7 @@ export default {
         vm.extendRoutes(allowedRouter);
 
         //保存数据到store用作他处，非必需
-        vm.$store.commit('setMenu',allowedRouter)
+        vm.$store.dispatch('setMenu',allowedRouter)
         vm.$store.commit('setUser',userInfo)
        
         //权限检验方法

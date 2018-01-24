@@ -16,9 +16,10 @@ const store = new Vuex.Store({
             state.userData1 = data
         }
     },
-    getters: {
-    },
     actions: {
+        setMenu ({commit},data) {
+            commit('setMenu',data)
+        }
     }
 })
 export default store;

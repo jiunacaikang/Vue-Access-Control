@@ -171,14 +171,14 @@ export default {
     }
   },
   created: function() {
-    //let user = this.$parent.userData || JSON.parse(util.local('userInfo'));
+    //let user = this.$parent.userData;
     let user = this.userData1;
     if (user) {
       this.user = user;
     } else {
       this.$router.push({ path: "/login" });
     }
-    //let menus = this.$parent.menuData || JSON.parse(util.local('menuData'));
+    //let menus = this.$parent.menuData;
     let menus = this.menuData1;
     if (menus) {
       this.menus = menus;
